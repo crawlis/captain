@@ -1,0 +1,41 @@
+language: bash
+
+services:
+  - docker
+
+os: linux
+dist: xenial
+
+env:
+  global:
+    - MODULE_TARGET=x86_64-unknown-linux-musl
+
+jobs:
+  fast_finish: true
+  include:
+    - env:
+        - MODULE_NAME=crawler
+        - MODULE_TAG=v0.0.1
+    - env:
+        - MODULE_NAME=keeper
+        - MODULE_TAG=v0.0.1
+
+script:
+  - >
+    docker build -t crawlis/${MODULE_NAME}-${TRAVIS_TAG}-debug \
+    --build-arg MODULE_NAME=${MODULE_NAME} \
+    --build-arg MODULE_TAG=${MODULE_TAG} \
+    --build-arg MODULE_TARGET=${MODULE_TARGET}
+    -- f ./dockerfiles/module-debug.Dockerfile .
+  - >
+    docker build -t crawlis/${MODULE_NAME}-${TRAVIS_TAG} \
+    --build-arg MODULE_NAME=${MODULE_NAME} \
+    --build-arg MODULE_TAG=${MODULE_TAG} \
+    --build-arg MODULE_TARGET=${MODULE_TARGET}
+    -- f ./dockerfiles/module.Dockerfile .
+
+branches:
+  only:
+    - master
+    # Regex pattern to match tags
+    - /^v\d+\.\d+\.\d+.*$/
