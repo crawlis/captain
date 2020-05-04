@@ -6,7 +6,6 @@ services:
       args:
         - MODULE_NAME=crawler
         - MODULE_TAG=v0.0.1
-        - MODULE_TARGET=x86_64-unknown-linux-musl
     depends_on:
       - keeper
 
@@ -16,6 +15,5 @@ services:
       args:
         - MODULE_NAME=keeper
         - MODULE_TAG=v0.0.1
-        - MODULE_TARGET=x86_64-unknown-linux-musl
     ports:
       - 3030:3030
