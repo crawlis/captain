@@ -8,6 +8,8 @@ dist: xenial
 
 env:
   global:
+    - CRAWLER_TAG=v0.0.1
+    - KEEPER_TAG=v0.0.1
     - MODULE_TARGET=x86_64-unknown-linux-musl
 
 jobs:
@@ -15,24 +17,40 @@ jobs:
   include:
     - env:
         - MODULE_NAME=crawler
-        - MODULE_TAG=v0.0.1
+        - MODULE_TAG=${CRAWLER_TAG}
     - env:
         - MODULE_NAME=keeper
-        - MODULE_TAG=v0.0.1
+        - MODULE_TAG=${KEEPER_TAG}
+
+before_script:
+  - set -e
 
 script:
   - >
-    docker build -t crawlis/${MODULE_NAME}-${TRAVIS_TAG}-debug \
-    --build-arg MODULE_NAME=${MODULE_NAME} \
-    --build-arg MODULE_TAG=${MODULE_TAG} \
+    docker build -t crawlis/${MODULE_NAME}-${MODULE_TAG}-debug
+    --build-arg MODULE_NAME=${MODULE_NAME}
+    --build-arg MODULE_TAG=${MODULE_TAG}
     --build-arg MODULE_TARGET=${MODULE_TARGET}
-    -- f ./dockerfiles/module-debug.Dockerfile .
+    -f ./dockerfiles/module-debug.Dockerfile .
   - >
-    docker build -t crawlis/${MODULE_NAME}-${TRAVIS_TAG} \
-    --build-arg MODULE_NAME=${MODULE_NAME} \
-    --build-arg MODULE_TAG=${MODULE_TAG} \
+    docker build -t crawlis/${MODULE_NAME}-${MODULE_TAG}
+    --build-arg MODULE_NAME=${MODULE_NAME}
+    --build-arg MODULE_TAG=${MODULE_TAG}
     --build-arg MODULE_TARGET=${MODULE_TARGET}
-    -- f ./dockerfiles/module.Dockerfile .
+    -f ./dockerfiles/module.Dockerfile .
+
+after_script:
+  - set +e
+
+before_deploy:
+  - echo ${DOCKERHUB_ACCESS_TOKEN} | docker login --username crawlis --password-stdin
+
+deploy:
+  provider: script
+  script: docker push crawlis/${MODULE_NAME}-${MODULE_TAG}-debug && docker push crawlis/${MODULE_NAME}-${MODULE_TAG}
+  on:
+    repo: crawlis/captain
+    tags: true
 
 branches:
   only:

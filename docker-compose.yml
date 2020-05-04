@@ -15,7 +15,6 @@ services:
       - MAX_RETRIES=10
     depends_on:
       - keeper
-    restart: unless-stopped
 
   keeper:
     build:
