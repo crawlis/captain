@@ -8,8 +8,8 @@ dist: xenial
 
 env:
   global:
-    - CRAWLER_TAG=v0.0.1
-    - KEEPER_TAG=v0.0.1
+    - CRAWLER_TAG=v0.1.0
+    - KEEPER_TAG=v0.1.0
     - MODULE_TARGET=x86_64-unknown-linux-musl
 
 jobs:
