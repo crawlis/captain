@@ -2,27 +2,39 @@ version: "3.7"
 services:
   crawler:
     build:
-      context: .
-      dockerfile: ./dockerfiles/module-debug.Dockerfile
-      args:
-        - MODULE_NAME=crawler
-        - MODULE_TAG=v0.0.1
-        - MODULE_TARGET=x86_64-unknown-linux-musl
+      context: ../crawler
+      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
     environment:
-      - KEEPER_HOST=keeper
-      - KEEPER_PORT=3030
+      - NATS_URI=nats://nats:4222
       - STARTING_URL=https://lemonde.fr
-      - MAX_RETRIES=10
     depends_on:
-      - keeper
+      - nats
+
+  nats:
+    image: "nats"
+    expose:
+      - "4222"
+    ports:
+      - "8222:8222"
 
   keeper:
     build:
-      context: .
-      dockerfile: ./dockerfiles/module-debug.Dockerfile
-      args:
-        - MODULE_NAME=keeper
-        - MODULE_TAG=v0.0.1
-        - MODULE_TARGET=x86_64-unknown-linux-musl
+      context: ../keeper
+      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
+    env_file: ../keeper/.env
     environment:
-      - SERVER_PORT=3030
+      - NATS_URI=nats://nats:4222
+      - DATABASE_URI=postgresql://postgres:password@keeper-db/keeper
+    depends_on:
+      - nats
+      - keeper-db
+
+  keeper-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=keeper
+    ports:
+      - "5432:5432"
+    restart: unless-stopped

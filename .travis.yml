@@ -31,13 +31,13 @@ script:
     --build-arg MODULE_NAME=${MODULE_NAME}
     --build-arg MODULE_TAG=${MODULE_TAG}
     --build-arg MODULE_TARGET=${MODULE_TARGET}
-    -f ./dockerfiles/module-debug.Dockerfile .
+    -f ./dockerfiles/generic-module-debug.Dockerfile .
   - >
     docker build -t crawlis/${MODULE_NAME}-${MODULE_TAG}
     --build-arg MODULE_NAME=${MODULE_NAME}
     --build-arg MODULE_TAG=${MODULE_TAG}
     --build-arg MODULE_TARGET=${MODULE_TARGET}
-    -f ./dockerfiles/module.Dockerfile .
+    -f ./dockerfiles/generic-module-release.Dockerfile .
 
 after_script:
   - set +e
