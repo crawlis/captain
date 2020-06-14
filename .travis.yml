@@ -10,6 +10,7 @@ env:
   global:
     - CRAWLER_TAG=v0.1.0
     - KEEPER_TAG=v0.1.0
+    - PLANNER_TAG=v0.1.0
     - MODULE_TARGET=x86_64-unknown-linux-musl
 
 jobs:
@@ -21,6 +22,9 @@ jobs:
     - env:
         - MODULE_NAME=keeper
         - MODULE_TAG=${KEEPER_TAG}
+    - env:
+        - MODULE_NAME=planner
+        - MODULE_TAG=${PLANNER_TAG}
 
 before_script:
   - set -e

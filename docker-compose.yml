@@ -10,24 +10,32 @@ services:
     depends_on:
       - nats
 
-  nats:
-    image: "nats"
-    expose:
-      - "4222"
-    ports:
-      - "8222:8222"
-
   keeper:
     build:
       context: ../keeper
       dockerfile: ./dockerfiles/local-module-debug.Dockerfile
-    env_file: ../keeper/.env
     environment:
       - NATS_URI=nats://nats:4222
       - DATABASE_URI=postgresql://postgres:password@keeper-db/keeper
     depends_on:
       - nats
       - keeper-db
+
+  planner:
+    build:
+      context: ../planner
+      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
+    environment:
+      - NATS_URI=nats://nats:4222
+      - STARTING_URL=https://lemonde.fr
+    depends_on:
+      - nats
+
+  nats:
+    image: "nats"
+    ports:
+      - "8222:8222"
+    restart: unless-stopped
 
   keeper-db:
     image: postgres
