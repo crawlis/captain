@@ -31,13 +31,13 @@ before_script:
 
 script:
   - >
-    docker build -t crawlis/${MODULE_NAME}-${MODULE_TAG}-debug
+    docker build -t crawlis/${MODULE_NAME}:${MODULE_TAG}-debug
     --build-arg MODULE_NAME=${MODULE_NAME}
     --build-arg MODULE_TAG=${MODULE_TAG}
     --build-arg MODULE_TARGET=${MODULE_TARGET}
     -f ./dockerfiles/generic-module-debug.Dockerfile .
   - >
-    docker build -t crawlis/${MODULE_NAME}-${MODULE_TAG}
+    docker build -t crawlis/${MODULE_NAME}:${MODULE_TAG}
     --build-arg MODULE_NAME=${MODULE_NAME}
     --build-arg MODULE_TAG=${MODULE_TAG}
     --build-arg MODULE_TARGET=${MODULE_TARGET}
@@ -51,7 +51,7 @@ before_deploy:
 
 deploy:
   provider: script
-  script: docker push crawlis/${MODULE_NAME}-${MODULE_TAG}-debug && docker push crawlis/${MODULE_NAME}-${MODULE_TAG}
+  script: docker push crawlis/${MODULE_NAME}:${MODULE_TAG}-debug && docker push crawlis/${MODULE_NAME}:${MODULE_TAG}
   on:
     repo: crawlis/captain
     tags: true
