@@ -16,10 +16,10 @@ services:
       dockerfile: ./dockerfiles/local-module-debug.Dockerfile
     environment:
       - NATS_URI=nats://nats:4222
-      - DATABASE_URI=postgresql://postgres:password@keeper-db/keeper
+      - DATABASE_URI=postgresql://postgres:password@database/keeper
     depends_on:
       - nats
-      - keeper-db
+      - database
 
   planner:
     build:
@@ -27,9 +27,11 @@ services:
       dockerfile: ./dockerfiles/local-module-debug.Dockerfile
     environment:
       - NATS_URI=nats://nats:4222
+      - DATABASE_URI=postgresql://postgres:password@database/keeper
       - STARTING_URL=https://lemonde.fr
     depends_on:
       - nats
+      - database
 
   nats:
     image: "nats"
@@ -37,7 +39,7 @@ services:
       - "8222:8222"
     restart: unless-stopped
 
-  keeper-db:
+  database:
     image: postgres
     environment:
       - POSTGRES_USER=postgres
