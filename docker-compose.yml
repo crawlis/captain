@@ -1,19 +1,27 @@
 version: "3.7"
 services:
-  crawler:
+  crawler-released:
     build:
-      context: ../crawler
-      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
+      context: .
+      dockerfile: ./dockerfiles/generic-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=crawler
+        - MODULE_TAG=v0.1.0
+        - MODULE_TARGET=x86_64-unknown-linux-musl
     environment:
       - NATS_URI=nats://nats:4222
       - STARTING_URL=https://lemonde.fr
     depends_on:
       - nats
 
-  keeper:
+  keeper-released:
     build:
-      context: ../keeper
-      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
+      context: .
+      dockerfile: ./dockerfiles/generic-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=keeper
+        - MODULE_TAG=v0.1.0
+        - MODULE_TARGET=x86_64-unknown-linux-musl
     environment:
       - NATS_URI=nats://nats:4222
       - DATABASE_URI=postgresql://postgres:password@database/keeper
@@ -21,16 +29,83 @@ services:
       - nats
       - database
 
-  planner:
+  planner-released:
     build:
-      context: ../planner
-      dockerfile: ./dockerfiles/local-module-debug.Dockerfile
+      context: .
+      dockerfile: ./dockerfiles/generic-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=planner
+        - MODULE_TAG=v0.1.0
+        - MODULE_TARGET=x86_64-unknown-linux-musl
     environment:
       - NATS_URI=nats://nats:4222
       - DATABASE_URI=postgresql://postgres:password@database/keeper
       - STARTING_URL=https://lemonde.fr
     depends_on:
       - nats
+      - database
+
+  professor-released:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/generic-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=planner
+        - MODULE_TAG=v0.1.0
+        - MODULE_TARGET=x86_64-unknown-linux-musl
+    environment:
+      - DATABASE_URI=postgresql://postgres:password@database/keeper
+    depends_on:
+      - database
+
+  crawler-local:
+    build:
+      context: ../crawler
+      dockerfile: ../captain/dockerfiles/local-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=crawler
+    environment:
+      - NATS_URI=nats://nats:4222
+      - STARTING_URL=https://lemonde.fr
+    depends_on:
+      - nats
+
+  keeper-local:
+    build:
+      context: ../keeper
+      dockerfile: ../captain/dockerfiles/local-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=keeper
+    environment:
+      - NATS_URI=nats://nats:4222
+      - DATABASE_URI=postgresql://postgres:password@database/keeper
+    depends_on:
+      - nats
+      - database
+
+  planner-local:
+    build:
+      context: ../planner
+      dockerfile: ../captain/dockerfiles/local-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=planner
+    environment:
+      - NATS_URI=nats://nats:4222
+      - DATABASE_URI=postgresql://postgres:password@database/keeper
+      - STARTING_URL=https://lemonde.fr
+    depends_on:
+      - nats
+      - database
+
+  professor-local:
+    build:
+      context: ../professor
+      dockerfile: ../captain/dockerfiles/local-module-${OPT_LEVEL}.Dockerfile
+      args:
+        - MODULE_NAME=professor
+    environment:
+      - DATABASE_URI=postgresql://postgres:password@database/keeper
+    depends_on:
       - database
 
   nats:
